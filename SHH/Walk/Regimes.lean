@@ -37,7 +37,9 @@ theorem s_succ (p : ℚ) (D : ℕ) (hp0 : p ≠ 0) (hph : p ≠ 1/2) :
 /-- **More distance costs more steps**, for every `0 < p < 1`. -/
 theorem s_strictMono_D (p : ℚ) (D : ℕ) (hp0 : 0 < p) (hp1 : p < 1) : s p D < s p (D + 1) := by
   by_cases hph : p = 1/2
-  · subst hph; rw [s_half, s_half]; push_cast; nlinarith
+  · subst hph; rw [s_half, s_half]; push_cast
+    have : (0 : ℚ) ≤ D := by positivity
+    nlinarith
   · have h := s_succ p D hp0.ne' hph
     have hq : 0 < 1 - p := by linarith
     have ha : 0 ≤ (1 - p)/p := by positivity
@@ -61,7 +63,7 @@ theorem s_strictMono_D (p : ℚ) (D : ℕ) (hp0 : 0 < p) (hp1 : p < 1) : s p D <
 theorem drift_bounds (p : ℚ) (D : ℕ) (hp : 1/2 < p) (hp1 : p ≤ 1) :
     (D : ℚ)/(2*p - 1) - 2*p*(1 - p)/(2*p - 1)^2 ≤ s p D ∧ s p D ≤ (D : ℚ)/(2*p - 1) := by
   have hph : p ≠ 1/2 := by intro h; linarith
-  have hden : 0 < (2*p - 1)^2 := by positivity
+  have hden : 0 < (2*p - 1)^2 := pow_pos (by linarith) 2
   have hq : 0 ≤ 1 - p := by linarith
   have hp0 : 0 < p := by linarith
   have hx0 : 0 ≤ ((1 - p)/p)^D := by positivity
@@ -80,7 +82,7 @@ theorem drift_bounds (p : ℚ) (D : ℕ) (hp : 1/2 < p) (hp1 : p ≤ 1) :
 
 /-- **The diffusion regime** (P₊ > P₋): the paper's Eq. 4, exactly. The first term is
 exponential in `D`, since `(1 − p)/p > 1`. -/
-theorem s_diffusion_form (p : ℚ) (D : ℕ) (hp0 : 0 < p) (hp : p < 1/2) :
+theorem s_diffusion_form (p : ℚ) (D : ℕ) (hp : p < 1/2) :
     s p D = 2*p*(1 - p)*(((1 - p)/p)^D - 1)/(1 - 2*p)^2 - (D : ℚ)/(1 - 2*p) := by
   have hph : p ≠ 1/2 := by intro h; linarith
   have h2 : (1 - 2*p) ≠ 0 := by intro h; linarith
