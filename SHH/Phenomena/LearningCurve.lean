@@ -280,6 +280,6 @@ theorem worsens_not_improves (T : Curve) (lo hi : Nat) (h : Worsens T lo hi) :
   intro hi'
   obtain ⟨n, hlo, hhi, hlt⟩ := h
   have := hi' n hlo hhi
-  exact absurd hlt (not_lt.mpr this)
+  grind
 
 end SHH.Phenomena
