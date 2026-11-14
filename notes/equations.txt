@@ -1,0 +1,17 @@
+Equations transcribed from screenshot (LaTeX)
+
+(1)  p_- = \frac{1}{1 + (\mu - 1)(1 - r)}
+
+(2)  s = \frac{2}{(2p_- - 1)^2} \left[ p_-^2 + p_-(D - 1) - (D/2) + \frac{(1 - p_-)^{D+1}}{p_-^{D-1}} \right]
+
+(3)  s \approx \frac{D}{p_- - p_+}
+
+(4)  s \approx 2 \left( \frac{1 - p_-}{p_-} \right)^{D-1} \left( \frac{1 - p_-}{1 - 2p_-} \right)^2
+
+(5)  s \approx 2 \frac{n}{\mu} (1 - r)^{(\ln n / \ln \mu) - 1}
+
+(6)  s \approx \ln n / \ln \mu
+
+Notes
+- p_- is the probability of moving toward the goal; p_+ = 1 - p_- is the probability of moving away.
+- Eq. 5 exponent: printed as "ln n/ln mu - 1"; grouped here as (ln n / ln mu) - 1, i.e. D - 1 with D ~ ln n / ln mu, which is what Eq. 4 reduces to when p_- ~ 1/(mu(1 - r)).

@@ -11,7 +11,7 @@ How to read it:
 
 ## SHH88Revisited
 
-64 theorems: 52 general, 12 instances; 22 headline; 13 about laws; 5 conditional on laws.
+66 theorems: 54 general, 12 instances; 24 headline; 13 about laws; 5 conditional on laws.
 
 **Laws**
 
@@ -52,6 +52,8 @@ How to read it:
 | `SHH.Walk.s_one` | general | — | With a perfect decision procedure the walk never steps back: `s 1 D = D` (the paper's Eq. 6 regime at r = 1). |
 | `SHH.Walk.sys_unique` | general | — | The system has at most one solution (for `p ≠ 0`): two solutions agree at every distance up to `D`. |
 | `SHH.Walk.term_sys` | general | — | The general term solves the system (postulate W), for every `0 < p ≤ 1`. |
+| `SHH.Walk.eq2_printed` | general | — | The printed Eq. 2 is the closed form, for every `p ∉ {0, 1/2}` and every `D`. |
+| `SHH.Walk.eq4_remainder` | general | — | Eq. 4 is Eq. 2's exponential term: the difference is a term linear in `D`. |
 | `SHH.Walk.drift_bounds` | general | — | The drift regime (P₋ > P₊): two-sided exact bounds, the paper's Eq. 3 `s ≈ D/(P₋ − P₊)` as the upper bound, with the gap at most `2p(1 − p)/(2p − 1)²`. |
 | `SHH.Walk.fan_witness_walk` | instance | — | The fan effect inside the walk, exactly: at r = 0, μ = 3 → 5 (p = 1/3 → 1/5) with the distance falling 8 → 6, expected steps rise from 996 to 3630. |
 | `SHH.Walk.s_diffusion_form` | general | — | The diffusion regime (P₊ > P₋): the paper's Eq. 4, exactly. |
@@ -62,5 +64,5 @@ How to read it:
 
 | Package | Theorems | General | Instances | About laws | Conditional on laws | Headline |
 |---|---|---|---|---|---|---|
-| SHH88Revisited | 64 | 52 | 12 | 13 | 5 | 22 |
-| **All** | 64 | 52 | 12 | 13 | 5 | 22 |
+| SHH88Revisited | 66 | 54 | 12 | 13 | 5 | 24 |
+| **All** | 66 | 54 | 12 | 13 | 5 | 24 |

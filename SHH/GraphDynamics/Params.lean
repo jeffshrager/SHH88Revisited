@@ -14,8 +14,8 @@ goes toward the goal with probability
 `pOf` and `DOf` are these two maps, over the reals. Nothing here derives them from the bit
 game; they are the paper's idealizations, stated as definitions.
 
-The paper's Eq. 5 approximates `(μ − 1)^D` by `μ^D = n` inside the exponential term of the
-diffusion regime. `eq5_error_factor` and `eq5_error_bound` give the omitted factor,
+The paper's Eq. 5 comes from Eq. 4 with `(1 − p)/p = (μ − 1)(1 − r)`, approximating
+`(μ − 1)^(D−1)` by `μ^(D−1) = n/μ` (the printed equations are in `notes/equations.txt`). `eq5_error_factor` and `eq5_error_bound` give the omitted factor,
 `((μ − 1)/μ)^D ≤ exp(−D/μ)`: at `μ = 3`, `n = 10⁴` (`D ≈ 8.4`) it is below `e^{−2.8}`, so
 the approximation is off by more than an order of magnitude where the paper applies it to
 small `μ`.
