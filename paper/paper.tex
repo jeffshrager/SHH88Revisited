@@ -44,14 +44,14 @@ curves. Most of the 1988 mathematics survives: the expected-steps formula
 is correct exactly as printed, and its drift and diffusion regimes hold,
 one of them in a sharper form. But two of the paper's conclusions do not
 follow from its own theory. With no decision procedure, the idealized
-model shows a fan effect in large problem spaces that the paper says is
-absent; and with a perfect
+model shows a fan effect in sparse graphs, which the paper's general
+statement rules out; and with a perfect
 decision procedure the ``power-law decay'' it derives is logarithmic, a
 curve with every qualitative signature of a power law over the range
 plotted, and provably not one over long ranges. In the bit game itself,
 exact results reproduce the pattern of the 1988 simulations. But the
-theory's fan effect turns out to depend on the size of the problem space,
-and at the size of the game it predicts none, so the theory does not
+theory, started where the game starts, does not: at the size that was
+simulated it predicts steady improvement in every regime, so it does not
 explain the fan effect that the simulations showed. None of these findings
 needed new
 mathematics. They needed the theory written down precisely enough that its
@@ -102,8 +102,9 @@ establishes it.
 
 The outcome is a mixed verdict, which is the interesting kind. The
 mathematics of the walk is right. But the two conclusions the paper drew
-from it about practice do not follow: one is contradicted by the paper's
-own idealized model, and the other names the wrong curve. And the theory
+from it about practice do not follow: one fails in the paper's own
+idealized model outside a range the paper does not state, and the other
+names the wrong curve. And the theory
 and the game, which the paper treated as showing the same thing, turn out
 to come apart in a place nobody was looking.
 
@@ -206,18 +207,20 @@ to solve the problem''. The approximation replaces $(\mu-1)^{D-1}$ by
 $\mu^{D-1} = n/\mu$, dropping a factor $((\mu-1)/\mu)^{D-1}$ that is at most
 $e^{-(D-1)/\mu}$ (\lean{SHH.GD.eq5\_error\_bound}). The paper states Eq.~5
 for $\mu(1-r) \gg 1$, and there the factor is harmless. But the conclusion
-about $r = 0$ is stated without that proviso, and where $\mu$ is small,
-which is where learning starts, the factor is far from one. Restoring it
-reverses the conclusion. With $n = 2^{16}$ nodes, where the diameter is an
+about $r = 0$ is stated without that proviso, and in a sparse graph, where
+$\mu$ is small, the factor is far from one. Restoring it reverses the
+conclusion there. With $n = 2^{16}$ nodes, where the diameter is an
 integer for $\mu = 2, 4, 16, 256$ (\lean{SHH.GD.DOf\_pow2}), the paper's
 own idealized model gives the expected steps in Table~\ref{tab:fan}: at
 $r = 0$, raising the mean branching from 2 to 4 raises the expected steps
 from 256 to 9{,}824, and by $\mu = 16$ they have come back down only to
 7{,}744 (\lean{SHH.GD.fan\_pow2\_zero}; numerically the peak is near
-$\mu = 6$). In the theory, in a space this large, there is a fan effect
+$\mu = 6$). In the theory, in a sparse enough graph, there is a fan effect
 with no decision procedure at all. The same happens at the $n = 10{,}000$
 of the paper's Figure~2, where the prototype has the expected steps rising
-from $\mu = 2$ until about $\mu = 5$.
+from $\mu = 2$ until about $\mu = 5$. Whether any of this touches the bit
+game is a separate question, and Section~\ref{sec:game} takes it up: the
+game is never that sparse.
 
 \begin{table}[H]
 \centering\small
@@ -286,25 +289,29 @@ mediocre one. (Individual games can still slow down at $r = 0$: \code{000}
 $\to$ \code{001} goes from 7 to $133/15$ expected steps,
 \lean{SHH.BitGame.chunk\_slows\_game}. It is the average that improves.)
 
-So the game shows no fan effect at $r = 0$, and the theory, in
-Table~\ref{tab:fan}, shows one. My first thought was that this was the
-tree's fault: a hypercube is full of short cycles, and the tree the theory
-substitutes for it has none. That is not what the theorems say. The
-theory's fan effect depends on the size of the space. Table~\ref{tab:fan}
-has $2^{16}$ nodes; the three-bit game has 8. At 8 and at 16 nodes the
-idealized model has no fan effect, at $r = 0$ or at $r = \tfrac12$:
-over the settings where the diameter is an integer, every increase in
-$\mu$ lowers the expected steps (\lean{SHH.GD.no\_fan\_small}; with 16 nodes
-and $r = \tfrac12$, for instance, $\mu = 2, 4, 16$ give $8.25$, $5$ and
-$1$). The prototype, which can use any $\mu$, says the same in between and
-at the 32 nodes of the 1988 simulations; the first slight rise appears at
-about 64 nodes.
+How does this compare with the theory? The comparison has to be made
+where the game is. A $B$-bit game has $2^B$ states and starts as a
+hypercube, with branching $\mu = B$, and learning only adds edges from
+there. Table~\ref{tab:fan} has $2^{16}$ nodes, the size of a sixteen-bit
+game, but its first two rows, $\mu = 2$ and $4$, are graphs far sparser
+than that game ever is. Read from $\mu = 16$ down, the $r = 0$ column only
+improves, 7{,}744 to 512. The same holds at four bits
+(\lean{SHH.GD.hypercube\_start\_falls}), and in the prototype at every size
+I have tried from 3 to 24 bits: the rise at $r = 0$ always lies below the
+hypercube's own branching. So for the bit game the 1988 sentence was right.
+At $r = 0$ more edges do reduce the time, and theory and game agree. What
+Section~\ref{sec:entails} refutes is the general statement, not its
+application to the game.
 
-So at the size of the game, theory and game agree at $r = 0$, where
-neither has a fan effect, and disagree at $r = \tfrac12$, where the game
-has one and the theory does not. This is the reverse of what the 1988
-paper took the theory to show. Its Figure~2 plotted Eq.~2 for 10{,}000
-nodes and found the simulations' pattern in it; at the 32 nodes of the
+At $r = \tfrac12$ it is the other way round. The game has a fan effect:
+the simulations showed it at five bits, and Table~\ref{tab:game} shows it
+at three. The theory, started at $\mu = B$, does not. At four bits the
+expected steps go from 5 to 1, and at sixteen from 1{,}117.75 to 257 (the
+same theorem); in the prototype they fall steadily at five bits, and at
+every size up to about twenty bits, where a rise of about one percent
+first appears. The 1988 Figure~2 plotted Eq.~2 for 10{,}000 nodes, where a
+fan effect at $r = \tfrac12$ does appear in sparse graphs, and found the
+simulations' pattern in it. At the 32 states and the branching of the
 simulations themselves, the same equation predicts steady improvement in
 every regime. The fan effect in the bit game is real, but the walk is not
 what explains it. I do not yet know what does. The comparison is rough,
@@ -350,10 +357,10 @@ Eq.~2, the expected steps & proved, exactly as printed (\lean{SHH.Walk.eq2\_prin
 $s = D^2$ when $p_+ = p_-$ & proved; fixes reflection at $D$ (\lean{SHH.Walk.s\_half}) \\
 Eq.~3, drift & proved as a two-sided bound (\lean{SHH.Walk.drift\_bounds}) \\
 Eq.~4, diffusion & proved as Eq.~2's exponential term (\lean{SHH.Walk.eq4\_remainder}) \\
-Eq.~5 and ``at $r = 0$ more edges reduce the time'' & refuted in the paper's own idealized model for large spaces (\lean{SHH.GD.fan\_pow2\_zero}); holds in the smallest ones (\lean{SHH.GD.no\_fan\_small}) \\
-Fan effect at intermediate $r$ & proved in the theory for large spaces (\lean{SHH.GD.fan\_pow2\_half}) and in the three-bit game (\lean{SHH.BitGame.figure1\_pattern\_three}) \\
+Eq.~5 and ``at $r = 0$ more edges reduce the time'' & refuted as a general statement, in sparse graphs (\lean{SHH.GD.fan\_pow2\_zero}); true from the bit game's starting point (\lean{SHH.GD.hypercube\_start\_falls}) \\
+Fan effect at intermediate $r$ & proved in the theory for sparse graphs (\lean{SHH.GD.fan\_pow2\_half}) and in the three-bit game (\lean{SHH.BitGame.figure1\_pattern\_three}) \\
 Eq.~6 and ``a power-law decay'' & reinterpreted: logarithmic, not a power law (\lean{SHH.GD.curveGD\_not\_powerLaw}) \\
-Eq.~2 ``produces the range of behaviors observed'' & not at the size of the game: there the theory has no fan effect at $r = \tfrac12$, and the game does (\lean{SHH.GD.no\_fan\_small}, \lean{SHH.BitGame.figure1\_pattern\_three}) \\
+Eq.~2 ``produces the range of behaviors observed'' & not from the game's starting point: there the theory has no fan effect at $r = \tfrac12$, and the game does (\lean{SHH.GD.hypercube\_start\_falls}, \lean{SHH.BitGame.figure1\_pattern\_three}) \\
 $r = 1$ approximates optimal search & proved optimal on the initial operators (\lean{SHH.BitGame.r1\_moves\_closer}); not optimal with learned ones (\lean{SHH.BitGame.greedy\_not\_optimal}) \\
 \bottomrule
 \end{tabularx}
@@ -378,8 +385,9 @@ and treated the walk's behavior as the game's. In the formalization the
 game and the walk are separate objects, and the step between them is a
 postulate with a name. That is what made it possible to ask whether a
 conclusion of the theory holds of the game, and to find that the theory's
-fan effect and the game's are not the same effect: one needs a large space
-and the other was observed in a space of 32 states.
+fan effect and the game's are not the same effect: one needs a graph
+sparser than the game ever is, and the other was observed in a hypercube
+of 32 states.
 I think this is the general lesson. Idealizations are where theories make
 their least visible commitments; writing them down as first-class objects,
 rather than as a sentence of motivation, makes them something one can test.
@@ -411,8 +419,10 @@ simulation, with the sampler checked against the exact small cases, is the
 next step, and it will show whether the game's fan effect at five bits
 behaves as it does at three. The tree idealization is stated, not derived
 from random-graph theory \citep{bollobas1985}, and the exact results in the
-theory, in large spaces and small, use settings where the diameter is an
-integer; between those settings I have only the prototype's numbers. Nothing here concerns
+theory use settings where the diameter is an integer, which for a game
+started as a hypercube means four bits and sixteen. At three and five
+bits, the sizes of the exact game results and of the 1988 simulations, the
+comparison with the theory rests on the prototype's numbers. Nothing here concerns
 people: the phenomena are properties of the model's behavior, and
 connecting them to human practice data needs the usual assumptions about
 what is measured.

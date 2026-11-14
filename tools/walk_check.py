@@ -121,6 +121,28 @@ def main():
             row = "  ".join(f"{v:.2f}{'*' if i == pk and i > 0 else ''}" for i, v in enumerate(vals))
             print(f"    n={n:6d} r={r}: mu=2,3,4,5,6,8,10,16: {row}")
 
+    def peak(n, r, lo):
+        mus = [lo + i * 0.01 for i in range(int((min(n, 400) - lo) / 0.01))]
+        v = [s_gd(n, m, r) for m in mus]
+        i = max(range(len(v)), key=lambda i: v[i])
+        return mus[i], v[i], v[0]
+    print("\nFine grid of mu (step 0.01): smallest n with any rise above s(mu = 2):")
+    for r in [0, 0.5]:
+        for n in range(8, 200):
+            m, v, v0 = peak(n, r, 2.0)
+            if v > v0 * 1.0001:
+                print(f"    r={r}: n = {n} (peak at mu = {m:.2f})")
+                break
+    print("\nFrom the game's starting point: n = 2^B, mu from B upward (SHH.GD.hypercube_start_falls):")
+    for B in [3, 4, 5, 6, 8, 10, 13, 16, 20, 24]:
+        row = []
+        for r in [0, 0.5]:
+            m, _, _ = peak(2 ** B, r, 2.0)
+            m2, v2, v0 = peak(2 ** B, r, float(B))
+            row.append(f"r={r}: peak mu {m:5.1f}, from mu=B " +
+                       (f"rises x{v2 / v0:.2f} to mu={m2:.1f}" if v2 > v0 * 1.0001 else "falls"))
+        print(f"    B={B:2d}  " + "   ".join(row))
+
     print("\nSmall spaces, D exact (SHH.GD.no_fan_small), and the r = 1/2 column at n = 2^16:")
     for m in [3, 4, 6, 16]:
         for r in [F(0), F(1, 2)]:

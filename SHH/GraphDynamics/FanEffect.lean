@@ -19,11 +19,15 @@ the paper says more edges always help; its Eq. 5 reaches that conclusion by repl
 `(μ − 1)^(D−1)` with `μ^(D−1) = n/μ` (see `eq5_error_bound`), an approximation the paper
 states for `μ(1 − r) ≫ 1`, which excludes the small `μ` where the rise occurs.
 
-The effect depends on the size of the space. At `n = 8, 16` the same model shows no fan
-effect at `r = 0` or at `r = 1/2` (`no_fan_small`). The bit game at that size improves on
-average at `r = 0` and worsens at `r = 1/2` (`SHH.BitGame.figure1_pattern_three`), so at the
-game's own size the idealization agrees with the game at `r = 0` and misses its fan effect
-at `r = 1/2`.
+Where the rise lies matters for the bit game. A `B`-bit game has `n = 2^B` states and starts
+as a hypercube, with branching `μ = B`; learning only adds edges. From `μ = B` upward the
+idealized model falls at `r = 0` and at `r = 1/2`, at the two sizes where the diameters are
+integers, `B = 4` and `B = 16` (`hypercube_start_falls`); numerically
+(`tools/walk_check.py`) at every `B` from 3 to 24 for `r = 0`, and up to about `B = 20` for
+`r = 1/2`. The rise of `fan_pow2_zero` is in graphs sparser than the game's. The bit game
+itself improves on average at `r = 0` and worsens at `r = 1/2`
+(`SHH.BitGame.figure1_pattern_three`), so from the game's starting point the idealization
+agrees with the game at `r = 0` and misses its fan effect at `r = 1/2`.
 
 OPEN: the same at non-integer `D` (the closed form with a real exponent), and an exact
 condition for the sign of `ds/dμ` in the drift regime to replace the paper's.
@@ -92,14 +96,14 @@ theorem fan_pow2_half_values :
       Walk.s (2/257) 2 = 257 := by
   unfold Walk.s; norm_num
 
-/-! ### The fan effect depends on the size of the space
+/-! ### Small spaces, and the game's starting point
 
-The same idealized model at the size of the games that can be solved exactly: `n = 2^m` for
-`m = 3, 4` (the three- and four-bit games' state counts), at every `μ = 2^k` with `k ∣ m`,
-where the diameter is the integer `m/k` (`DOf_pow2_gen`). Between those settings, and at
-`n = 32`, the prototype (`tools/walk_check.py`, real exponent) also shows no rise; by
-`n = 64` a slight one appears (36 → 39.8 at `μ = 3`, `r = 0`). NOT MODELED: a certificate at
-non-integer `D`. -/
+The same idealized model at `n = 2^m` for `m = 3, 4`, at every `μ = 2^k` with `k ∣ m`, where
+the diameter is the integer `m/k` (`DOf_pow2_gen`). These are a few settings only. On a fine
+grid of `μ` the prototype (`tools/walk_check.py`, real exponent) finds that the rise comes in
+gradually with `n`, with no special size: a first sliver just above `μ = 2` at about `n = 24`
+for `r = 0` and about `n = 55` for `r = 1/2`. So `no_fan_small` is not a claim that small
+spaces have no fan effect anywhere. NOT MODELED: a certificate at non-integer `D`. -/
 
 /-- The diameters at powers of two, any size: `D(2^m, 2^k) = m/k`. -/
 theorem DOf_pow2_gen (m k : ℕ) (hk : 0 < k) : DOf ((2 : ℝ)^m) ((2 : ℝ)^k) = m / k := by
@@ -109,18 +113,33 @@ theorem DOf_pow2_gen (m k : ℕ) (hk : 0 < k) : DOf ((2 : ℝ)^m) ((2 : ℝ)^k) 
   have hk' : (k : ℝ) ≠ 0 := by positivity
   field_simp
 
-/-- **No fan effect in small spaces, in the paper's idealized model.** With `n = 8` or `16`
-nodes, the expected steps fall at every increase of `μ` over the integer-diameter settings,
-both with no decision procedure (`r = 0`: 9 → 1; 16 → 8 → 1) and with a mediocre one
-(`r = 1/2`: 11/2 → 1; 33/4 → 5 → 1). The fan
-effect of `fan_pow2_zero` and `fan_pow2_half` is a property of large spaces. (Postulates: the
-walk, I1, I2.) -/
+/-- **At 8 and 16 nodes the expected steps fall across the integer-diameter settings**, with
+no decision procedure (`r = 0`: 9 → 1; 16 → 8 → 1) and with a mediocre one (`r = 1/2`:
+11/2 → 1; 33/4 → 5 → 1). (Postulates: the walk, I1, I2. Only these settings: see the note
+above.) -/
 theorem no_fan_small :
     -- n = 8: μ = 2, 8 (D = 3, 1)
     (Walk.s (1/2) 3 = 9 ∧ Walk.s (1/8) 1 = 1) ∧ (Walk.s (2/3) 3 = 11/2 ∧ Walk.s (2/9) 1 = 1) ∧
     -- n = 16: μ = 2, 4, 16 (D = 4, 2, 1)
     (Walk.s (1/2) 4 = 16 ∧ Walk.s (1/4) 2 = 8 ∧ Walk.s (1/16) 1 = 1) ∧
     (Walk.s (2/3) 4 = 33/4 ∧ Walk.s (2/5) 2 = 5 ∧ Walk.s (2/17) 1 = 1) := by
+  unfold Walk.s; norm_num
+
+/-- **From the hypercube's own branching, the idealized model only improves.** A `B`-bit game
+has `n = 2^B` states and starts at `μ = B`. Where the diameters are integers: `B = 4`
+(`μ = 4 → 16`, `D = 2 → 1`) and `B = 16` (`μ = 16 → 256 → 65536`, `D = 4 → 2 → 1`), the
+expected steps fall at `r = 0` (8 → 1; 7744 → 512 → 1) and at `r = 1/2` (5 → 1;
+4471/4 → 257 → 1). So started where the bit game starts, the theory has no fan effect at
+`r = 1/2` at these sizes, and the rise of `fan_pow2_zero` (`μ = 2 → 4`) lies in graphs sparser
+than the game's. (Postulates: the walk, I1, I2; condition: the game starts as a hypercube,
+P2.) -/
+theorem hypercube_start_falls :
+    -- B = 4
+    Walk.s (1/16) 1 < Walk.s (1/4) 2 ∧ Walk.s (2/17) 1 < Walk.s (2/5) 2 ∧
+    -- B = 16, r = 0
+    Walk.s (1/65536) 1 < Walk.s (1/256) 2 ∧ Walk.s (1/256) 2 < Walk.s (1/16) 4 ∧
+    -- B = 16, r = 1/2
+    Walk.s (2/65537) 1 < Walk.s (2/257) 2 ∧ Walk.s (2/257) 2 < Walk.s (2/17) 4 := by
   unfold Walk.s; norm_num
 
 end SHH.GD
