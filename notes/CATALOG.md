@@ -11,7 +11,7 @@ How to read it:
 
 ## SHH88Revisited
 
-66 theorems: 54 general, 12 instances; 24 headline; 13 about laws; 5 conditional on laws.
+209 theorems: 85 general, 124 instances; 29 headline; 13 about laws; 5 conditional on laws.
 
 **Laws**
 
@@ -35,6 +35,10 @@ How to read it:
 
 | Theorem | Scope | Given | Statement |
 |---|---|---|---|
+| `SHH.BitGame.chunk_apply` | general | — | A chunk takes its own start to its own goal, in one step (P4). |
+| `SHH.BitGame.chunk_paper_applies` | instance | — | It connects two pairs of states: of the 32 five-bit states it applies to exactly `01010` and `01110`. |
+| `SHH.BitGame.chunk_slows_game` | instance | — | One chunk can slow a game down (the fan effect, for a single game). |
+| `SHH.BitGame.figure1_pattern_three` | general | — | Figure 1's pattern, exact, in the three-bit game. One chunk lowers the mean expected steps over all games at `r = 0` (8.2857 → 8.2635) and at `r = 1` (1.7143 → 1.6429), and raises it at `r = 1/... |
 | `SHH.GD.DOf_pow2` | general | — | The diameters are exact at powers of two: with `n = 2^16`, `D(n, 2^k) = 16/k`. |
 | `SHH.GD.fan_pow2_zero` | instance | — | A fan effect at `r = 0` in the paper's idealized model. With `n = 2^16` nodes and no decision procedure, raising the mean branching from 2 to 4 raises the expected steps from 256 to 9824; from ... |
 | `SHH.GD.eq5_error_bound` | general | — | The omitted factor is at most `exp(−D/μ)`, from `1 − 1/μ ≤ exp(−1/μ)`. |
@@ -42,6 +46,7 @@ How to read it:
 | `SHH.GD.curveGD_diminishingRelative` | general | — | Strictly diminishing relative returns: the proportional gain shrinks every trial, the signature that distinguishes a power curve from an exponential one. |
 | `SHH.GD.curveGD_improves` | general | — | The curve improves: more trials, fewer steps. |
 | `SHH.GD.curveGD_not_powerLaw` | general | — | Not a power law over long ranges: for any exponent `r` and tolerance `ε` with `(1 + ε)·r < 1`, approximate scale invariance under doubling fails beyond some trial. |
+| `SHH.Markov.hit_unique` | general | — | Expected hitting times are unique. Two solutions of the system agree at every state. |
 | `SHH.Phenomena.mix_diminishingRelative` | general | — | An average of exponential learners has diminishing relative returns. For positive weights and distinct positive rates, the average of two exponential curves has strictly diminishing relative re... |
 | `SHH.Phenomena.mix_not_shiftRatio` | general | — | So an average of exponential learners is not exponential. |
 | `SHH.Phenomena.power_diminishingRelative` | general | — | The power curve has strictly diminishing relative returns, for `a > 0` and `m ≥ 1`. |
@@ -64,5 +69,5 @@ How to read it:
 
 | Package | Theorems | General | Instances | About laws | Conditional on laws | Headline |
 |---|---|---|---|---|---|---|
-| SHH88Revisited | 66 | 54 | 12 | 13 | 5 | 24 |
-| **All** | 66 | 54 | 12 | 13 | 5 | 24 |
+| SHH88Revisited | 209 | 85 | 124 | 13 | 5 | 29 |
+| **All** | 209 | 85 | 124 | 13 | 5 | 29 |
