@@ -48,8 +48,10 @@ def apply (o : Op) (x : State) : Option State :=
 def ham (x y : State) : Nat := (List.zipWith (· != ·) x y).count true
 
 /-- The one-bit operator on position `i` of `B`, from `a` to `!a`. -/
-def flipOp (B i : Nat) (a : Bool) : Op :=
-  (List.range B).map fun j => if j = i then some (a, !a) else none
+def flipOp : Nat → Nat → Bool → Op
+  | 0, _, _ => []
+  | B + 1, 0, a => some (a, !a) :: List.replicate B none
+  | B + 1, i + 1, a => none :: flipOp B i a
 
 /-- **The initial operators** (P2): the `2B` one-bit operators. -/
 def initialOps (B : Nat) : List Op :=

@@ -9,6 +9,7 @@ import SHH.GraphDynamics.Practice
 import SHH.GraphDynamics.FanEffect
 import SHH.BitGame.Basic
 import SHH.BitGame.Decision
+import SHH.BitGame.Optimal
 import SHH.Markov.Hitting
 import SHH.BitGame.Exact
 import SHH.BitGame.ExactMean

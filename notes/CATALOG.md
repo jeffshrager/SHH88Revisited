@@ -11,7 +11,7 @@ How to read it:
 
 ## SHH88Revisited
 
-209 theorems: 85 general, 124 instances; 29 headline; 13 about laws; 5 conditional on laws.
+222 theorems: 98 general, 124 instances; 33 headline; 13 about laws; 5 conditional on laws.
 
 **Laws**
 
@@ -39,6 +39,10 @@ How to read it:
 | `SHH.BitGame.chunk_paper_applies` | instance | — | It connects two pairs of states: of the 32 five-bit states it applies to exactly `01010` and `01110`. |
 | `SHH.BitGame.chunk_slows_game` | instance | — | One chunk can slow a game down (the fan effect, for a single game). |
 | `SHH.BitGame.figure1_pattern_three` | general | — | Figure 1's pattern, exact, in the three-bit game. One chunk lowers the mean expected steps over all games at `r = 0` (8.2857 → 8.2635) and at `r = 1` (1.7143 → 1.6429), and raises it at `r = 1/... |
+| `SHH.BitGame.apply_flip` | general | — | A one-bit operator flips its bit, if the bit matches. |
+| `SHH.BitGame.ham_flip` | general | — | Flipping one bit changes the distance by one: up if the bit already agreed with the goal, down if it did not. |
+| `SHH.BitGame.mem_succs` | general | — | The successors under the initial operators are the one-bit flips. |
+| `SHH.BitGame.r1_moves_closer` | general | — | With a perfect decision procedure and the initial operators, every move is toward the goal: any successor given positive probability at `r = 1` is exactly one bit closer. |
 | `SHH.GD.DOf_pow2` | general | — | The diameters are exact at powers of two: with `n = 2^16`, `D(n, 2^k) = 16/k`. |
 | `SHH.GD.fan_pow2_zero` | instance | — | A fan effect at `r = 0` in the paper's idealized model. With `n = 2^16` nodes and no decision procedure, raising the mean branching from 2 to 4 raises the expected steps from 256 to 9824; from ... |
 | `SHH.GD.eq5_error_bound` | general | — | The omitted factor is at most `exp(−D/μ)`, from `1 − 1/μ ≤ exp(−1/μ)`. |
@@ -69,5 +73,5 @@ How to read it:
 
 | Package | Theorems | General | Instances | About laws | Conditional on laws | Headline |
 |---|---|---|---|---|---|---|
-| SHH88Revisited | 209 | 85 | 124 | 13 | 5 | 29 |
-| **All** | 209 | 85 | 124 | 13 | 5 | 29 |
+| SHH88Revisited | 222 | 98 | 124 | 13 | 5 | 33 |
+| **All** | 222 | 98 | 124 | 13 | 5 | 33 |
