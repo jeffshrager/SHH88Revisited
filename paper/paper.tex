@@ -1,0 +1,403 @@
+\documentclass[11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{float}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[hidelinks]{hyperref}
+
+\newcommand{\lean}[1]{\texttt{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\title{SHH Revisited: Don't Just Run Models, Reason About Them}
+\author{Jeff Shrager}
+\date{Draft, November 2026}
+
+\begin{document}
+\sloppy
+\maketitle
+
+\begin{center}
+\fbox{\parbox{0.9\linewidth}{\centering\large\textbf{Draft for Comment}\footnotemark}}
+\end{center}
+\footnotetext{This is a working draft. I welcome corrections,
+  constructive challenges, and especially proposals for
+  collaboration. Email me: \texttt{jshrager@gmail.com}.}
+\medskip
+
+\begin{abstract}
+In 1988, Tad Hogg, Bernardo Huberman and I proposed that the power law of
+practice need not be built into a learning mechanism: it could emerge from
+the dynamics of search in a problem space that learning makes more densely
+connected, and the same dynamics could make practice hurt, a
+problem-solving fan effect. The paper supported this with simulations of a
+simple ``bit game'' and with an analytic theory based on a random walk.
+Here I revisit that work by formalizing it in the Lean proof assistant, so
+that what the theory entails is checked by machine rather than read off
+curves. Most of the 1988 mathematics survives: the expected-steps formula
+is correct exactly as printed, and its drift and diffusion regimes hold,
+one of them in a sharper form. But two of the paper's conclusions do not
+follow from its own theory. With no decision procedure, the idealized
+model shows a fan effect that the paper says is absent; and with a perfect
+decision procedure the ``power-law decay'' it derives is logarithmic, a
+curve with every qualitative signature of a power law over the range
+plotted, and provably not one over long ranges. In the bit game itself,
+exact results reproduce the 1988 simulations' pattern, which locates the
+first discrepancy precisely: in the idealization that connects the game to
+the theory, not in the game. None of these findings needed new
+mathematics. They needed the theory written down precisely enough that its
+consequences could be checked.
+\end{abstract}
+
+\section{Introduction}
+\label{sec:intro}
+
+The power law of practice is one of the most robust regularities in the
+psychology of learning: the time to perform a task falls as a power of the
+number of times it has been performed \citep{snoddy1926,crossman1959,newell1981}.
+In 1988 the leading accounts obtained it in quite different ways. ACT*
+obtained it from a strengthening mechanism that itself follows a power law
+\citep{anderson1983}; Newell and Rosenbloom obtained it from the chunking
+of subgoals \citep{newell1981,rosenbloom1986}. Tad Hogg, Bernardo Huberman
+and I proposed a third account \citep{shh1988}. Problem solving is search
+through a problem-space graph; learning adds edges to the graph (new
+operators) and can improve the procedure that chooses among them. Neither
+change mentions a power law. Yet their interaction, under particular
+conditions, yields curves that look like one, and under other conditions
+yields the opposite: learning that makes performance worse. We called that
+the problem-solving fan effect, by analogy with the memory fan effect
+\citep{anderson1974}, and connected it to the utility problem in machine
+learning \citep{minton1985,markovitch1988}.
+
+That paper did its reasoning in two ways. It simulated a small task, the
+bit game, and it derived an analytic theory, a one-dimensional random walk
+whose expected length depends on how densely the graph is connected and how
+good the decision procedure is. Each regime of the walk was connected to a
+phenomenon: drift toward the goal to improvement with practice, a balance
+of branching against the shortening of paths to the fan effect. In this
+sense the 1988 paper already had the explanatory shape I have since been
+arguing for in CogLean \citep{coglean,cogleanintro}: mechanisms, together
+with stated conditions, entail phenomena, including conditions under which
+a phenomenon fails or reverses.
+
+What it did not have was a way to check that its conclusions followed. The
+derivations were done by hand, the approximations were judged by eye, and
+the agreement between theory and simulation was read off log-log plots. So
+I have written the 1988 theory and the bit game in Lean
+\citep{demoura2021,mathlib2020}, where the definitions that run are the
+same objects that theorems are about, and every claim of the paper has been
+given a status: proved, sharpened, reinterpreted, or refuted
+(Table~\ref{tab:claims}). The work is in a public repository
+\citep{shh88revisited}; every result below names the theorem that
+establishes it.
+
+The outcome is a mixed verdict, which is the interesting kind. The
+mathematics of the walk is right. But the two conclusions the paper drew
+from it about practice do not follow: one is contradicted by the paper's
+own idealized model, and the other names the wrong curve. And the place
+where theory and game come apart can be located exactly.
+
+\section{The model}
+\label{sec:model}
+
+I restate the 1988 model briefly, as the formalization reads it; the full
+list of postulates, conditions and idealizations, with page references, is
+in \code{notes/POSTULATES.md}.
+
+\paragraph{The bit game.} A state is a vector of $B$ bits. An operator is a
+pattern--result pair with don't-care positions: \code{?1?1?} $\to$
+\code{?0?0?} applies to any state with 1s in the second and fourth
+positions and sets them to 0. Play begins with the $2B$ one-bit operators,
+which connect the states as a hypercube. A trial draws a start and a goal,
+and performance is the number of operators applied to reach the goal
+(\lean{SHH.BitGame.apply}, \lean{SHH.BitGame.initialOps}).
+
+\paragraph{Learning.} After each trial, the operator that solves that game
+in one step is added, with a don't-care wherever start and goal agree.
+For \code{01110} $\to$ \code{10101} it is \code{01?10} $\to$ \code{10?01}
+(\lean{SHH.BitGame.chunk\_paper}), which ``connects two pairs of states'':
+it applies to exactly two of the 32 states
+(\lean{SHH.BitGame.chunk\_paper\_applies}). In general a learned operator
+takes its own start to its own goal (\lean{SHH.BitGame.chunk\_apply}).
+
+\paragraph{The decision procedure.} At a state, the applicable operators
+whose results are closest to the goal (by Hamming distance) are good, the
+rest bad; each bad one is discarded with probability $r$, and one operator
+is chosen at random from what remains. So $r = 1$ is a perfect procedure
+and $r = 0$ a random walk. The formalization computes the exact
+distribution over next states, with the probabilities of good and bad
+choices as binomial sums (\lean{SHH.BitGame.stepDist}).
+
+\paragraph{The theory.} To analyze typical rather than particular problem
+spaces, the paper idealizes the graph as random, with $n$ nodes and mean
+branching $\mu$, and then as a tree: start and goal are about the diameter
+$D = \ln n/\ln\mu$ apart, and at each node one edge leads toward the goal
+and $\mu - 1$ away. The decision procedure leaves $(\mu-1)(1-r)$ effective
+bad choices, so a step goes toward the goal with probability
+\begin{equation}
+p_- = \frac{1}{1 + (\mu - 1)(1 - r)} .
+\label{eq:pminus}
+\end{equation}
+The search becomes a walk on distance $0,\dots,D$ from the goal
+(\lean{SHH.GD.pOf}, \lean{SHH.GD.DOf}). Everything in the theory depends
+on this idealization, and the formalization keeps it separate from the
+game, as an explicit postulate. That separation turns out to matter.
+
+\section{The theory, checked}
+\label{sec:theory}
+
+\paragraph{The expected number of steps.} The paper gives the expected
+number of steps $s$ to reach the goal from distance $D$ as its Eq.~2,
+obtained by ``standard techniques'' \citep{vankampen1981}. The
+formalization states the walk as a linear system for the expected steps
+from every distance (\lean{SHH.Walk.Sys}), proves a closed form satisfies
+it (\lean{SHH.Walk.term\_sys}), and proves the system has only one
+solution (\lean{SHH.Walk.sys\_unique}); together these make the closed form
+the expected number of steps (\lean{SHH.Walk.sys\_eq\_s}). The paper's Eq.~2
+as printed,
+\[
+s = \frac{2}{(2p_- - 1)^2}\left[\,p_-^2 + p_-(D-1) - \frac{D}{2} + \frac{(1-p_-)^{D+1}}{p_-^{D-1}}\right],
+\]
+is exactly this function for every $p_-$ other than $0$ and $\tfrac12$
+(\lean{SHH.Walk.eq2\_printed}). The 1988 derivation was right.
+
+One detail had to be decided before any of this could be stated: what the
+walk does at distance $D$, where the paper says only that it is
+``constrained to remain within distance $D$''. The paper's own value for the
+symmetric case, $s = D^2$, settles it: that value holds if the walk is
+reflected back at $D$ (\lean{SHH.Walk.s\_half}), and not if it may stay
+there, which gives $D^2 + D$ (\lean{SHH.Walk.stay\_half\_sys}). A choice the
+paper left implicit is recoverable from what it reported.
+
+\paragraph{The regimes.} When steps toward the goal are more likely than
+steps away ($p_- > \tfrac12$), the paper's Eq.~3 says the walk drifts to the
+goal in about $D/(p_- - p_+)$ steps. This holds as a two-sided bound: the
+expected steps lie within $2p_-(1-p_-)/(2p_- - 1)^2$ below $D/(2p_- - 1)$,
+a constant that does not grow with $D$ (\lean{SHH.Walk.drift\_bounds}). When
+steps away are more likely, the paper's Eq.~4 gives the exponential term of
+Eq.~2, and the rest is a term only linear in $D$
+(\lean{SHH.Walk.eq4\_remainder}, \lean{SHH.Walk.s\_diffusion\_form}). In
+every regime, more distance costs strictly more steps
+(\lean{SHH.Walk.s\_strictMono\_D}).
+
+\section{What the theory entails, and what it does not}
+\label{sec:entails}
+
+The paper then turned the walk into claims about practice. Learning adds
+edges, so $\mu$ grows; more edges shorten the diameter, which helps, and add
+bad choices, which hurts. Two of the paper's conclusions about which effect
+wins do not follow.
+
+\paragraph{A fan effect where the paper says there is none.} For a weak
+decision procedure the paper approximates Eq.~4 by its Eq.~5, $s \approx
+(2n/\mu)(1-r)^{\ln n/\ln\mu - 1}$, and concludes that ``when $r = 0$
+(choices made at random), increasing the number of edges reduces the time
+to solve the problem''. The approximation replaces $(\mu-1)^{D-1}$ by
+$\mu^{D-1} = n/\mu$, dropping a factor $((\mu-1)/\mu)^{D-1}$ that is at most
+$e^{-(D-1)/\mu}$ (\lean{SHH.GD.eq5\_error\_bound}). Where $\mu$ is small,
+which is where learning starts, that factor is far from one. Restoring it
+reverses the conclusion. With $n = 2^{16}$ nodes, where the diameter is an
+integer for $\mu = 2, 4, 16, 256$ (\lean{SHH.GD.DOf\_pow2}), the paper's
+own idealized model gives the expected steps in Table~\ref{tab:fan}: at
+$r = 0$, raising the mean branching from 2 to 4 raises the expected steps
+from 256 to 9{,}824, and only from $\mu = 16$ on do more edges help
+(\lean{SHH.GD.fan\_pow2\_zero}). In the theory, there is a fan effect with
+no decision procedure at all.
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{@{}rrrrr@{}}
+\toprule
+$\mu$ & $D$ & $r = 0$ & $r = \tfrac12$ & $r = 1$ \\
+\midrule
+2   & 16 & 256     & 44.0    & 16 \\
+4   & 8  & 9{,}824 & 255.5   & 8 \\
+16  & 4  & 7{,}744 & 1{,}117.75 & 4 \\
+256 & 2  & 512     & 257$^\dagger$ & 2 \\
+\bottomrule
+\end{tabular}
+\caption{Expected steps in the paper's idealized model, $n = 2^{16}$, from
+the proved closed form (\lean{SHH.GD.fan\_pow2\_zero},
+\lean{SHH.GD.fan\_pow2\_half}, \lean{SHH.Walk.s\_one}). $^\dagger$From the
+prototype (\code{tools/walk\_check.py}), not certified.}
+\label{tab:fan}
+\end{table}
+
+\paragraph{A logarithm where the paper says power law.} With a strong
+decision procedure the paper's Eq.~6 gives $s \approx \ln n/\ln\mu$ and
+concludes that ``one obtains a power-law decay''. At $r = 1$ the
+approximation is exact: the walk never steps away, so $s = D$
+(\lean{SHH.Walk.s\_one}). To read this as a learning curve one needs a
+further condition the paper leaves implicit, that each trial adds a bounded
+number of edges, so that $\mu$ grows about linearly with trials. The curve
+is then $T(t) = \ln n/\ln(\mu_0 + ct)$ (\lean{SHH.GD.curveGD}). It improves
+with every trial (\lean{SHH.GD.curveGD\_improves}), and its proportional
+gains shrink trial by trial (\lean{SHH.GD.curveGD\_diminishingRelative}),
+the signature that distinguishes a power curve from an exponential one
+\citep{heathcote2000}. Over trials 1--100 it lies within about 12\% of a
+power law with exponent $-0.29$ (\code{tools/walk\_check.py}). But it is not
+a power law. Its doubling ratio $T(2t)/T(t)$ tends to 1, so for any
+exponent and tolerance, approximate scale invariance fails beyond some
+trial (\lean{SHH.GD.curveGD\_not\_powerLaw}). The curve is logarithmic. On a
+log-log plot over the one decade of Figure~1 of the 1988 paper, the
+difference is invisible.
+
+This does not undo the 1988 argument against building the power law into
+the mechanism. It sharpens it. The graph-dynamic model does not build in a
+power law, and, at least in its perfect-decision regime, it does not
+produce one either. What it produces is a curve that cannot be told apart
+from one over the range anyone plotted.
+
+\section{The game itself}
+\label{sec:game}
+
+The theory's conclusions are about an idealization. Is the fan effect at
+$r = 0$ a property of search in the bit game, or of the idealization? The
+formalization can answer this exactly for small games, because the expected
+number of steps in the game is the solution of a finite linear system, and
+that solution is unique whenever the goal is reachable
+(\lean{SHH.Markov.hit\_unique}, proved by the maximum principle). So a table
+of values checked to satisfy the system is the expected number of steps.
+
+On the three-bit game, adding one learned operator lowers the mean expected
+steps over all 56 games at $r = 0$ and at $r = 1$, and raises it at
+$r = \tfrac12$ (Table~\ref{tab:game}; \lean{SHH.BitGame.figure1\_pattern\_three}).
+The prototype finds the same for every one of the 32 operators that could
+be learned. This is the pattern of the 1988 simulations: improvement with
+no decision procedure and with a perfect one, degradation with a mediocre
+one. So the bit game does not show the fan effect at $r = 0$ that its
+idealization does. The discrepancy is in the idealization: a hypercube is
+full of short cycles, and the tree that the theory substitutes for it has
+none. (Individual games can still slow down at $r = 0$: \code{000}
+$\to$ \code{001} goes from 7 to $133/15$ expected steps,
+\lean{SHH.BitGame.chunk\_slows\_game}. It is the average that improves.)
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+& $r = 0$ & $r = \tfrac12$ & $r = 1$ \\
+\midrule
+initial operators & $58/7 \approx 8.286$ & $128/35 \approx 3.657$ & $12/7 \approx 1.714$ \\
+plus the chunk \code{00?} $\to$ \code{11?} & $2603/315 \approx 8.263$ & $\approx 3.682$ & $23/14 \approx 1.643$ \\
+\bottomrule
+\end{tabular}
+\caption{Mean expected steps over the 56 games of the three-bit game,
+exact (\lean{SHH.BitGame.mean\_r0\_Base} and its five companions).}
+\label{tab:game}
+\end{table}
+
+Two results about the perfect decision procedure complete the picture. With
+the initial operators, every move it can make brings the state one bit
+closer to the goal, for any number of bits, so it never searches or
+backtracks (\lean{SHH.BitGame.r1\_moves\_closer}). Once operators have been
+learned, this fails: on the four-bit game, with the learned operator
+\code{0000} $\to$ \code{1111}, the game \code{0001} $\to$ \code{1110} has a
+three-move solution (\lean{SHH.BitGame.three\_step\_path}) but the perfect
+procedure expects $15/4$ moves (\lean{SHH.BitGame.greedy\_not\_optimal}).
+Choosing the move that looks best by distance can miss the shortcut that
+learning created. The 1988 paper said as much, that its $r = 1$ procedure
+``only approximates optimal problem solving''; here is a case, exactly.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.42\linewidth}>{\raggedright\arraybackslash}X@{}}
+\toprule
+Claim of the 1988 paper & Status \\
+\midrule
+Eq.~2, the expected steps & proved, exactly as printed (\lean{SHH.Walk.eq2\_printed}) \\
+$s = D^2$ when $p_+ = p_-$ & proved; fixes reflection at $D$ (\lean{SHH.Walk.s\_half}) \\
+Eq.~3, drift & proved as a two-sided bound (\lean{SHH.Walk.drift\_bounds}) \\
+Eq.~4, diffusion & proved as Eq.~2's exponential term (\lean{SHH.Walk.eq4\_remainder}) \\
+Eq.~5 and ``at $r = 0$ more edges reduce the time'' & refuted in the paper's own idealized model (\lean{SHH.GD.fan\_pow2\_zero}) \\
+Fan effect at intermediate $r$ & proved, theory (\lean{SHH.GD.fan\_pow2\_half}) and game (\lean{SHH.BitGame.figure1\_pattern\_three}) \\
+Eq.~6 and ``a power-law decay'' & reinterpreted: logarithmic, not a power law (\lean{SHH.GD.curveGD\_not\_powerLaw}) \\
+Eq.~2 ``produces the range of behaviors observed'' & fails at $r = 0$ because of the tree idealization (\lean{SHH.BitGame.figure1\_pattern\_three}) \\
+$r = 1$ approximates optimal search & proved optimal on the initial operators (\lean{SHH.BitGame.r1\_moves\_closer}); not optimal with learned ones (\lean{SHH.BitGame.greedy\_not\_optimal}) \\
+\bottomrule
+\end{tabularx}
+\caption{The 1988 claims and their status. The full list is in \code{notes/CLAIMS.md}.}
+\label{tab:claims}
+\end{table}
+
+\section{Discussion}
+\label{sec:disc}
+
+The 1988 paper was mathematically careful, and most of its mathematics
+survives a machine check unchanged. What did not survive were two inferences
+from the mathematics to the psychology: an approximation applied where it
+is poor, and a curve called by the name of the curve it resembles. Neither
+is an unusual kind of mistake. Both are the kind a proof assistant catches
+almost incidentally, because it will not accept ``approximately'' without
+saying approximately what, over which range, and why.
+
+The more interesting finding is about idealization. The 1988 paper moved
+from the bit game to a random graph to a tree to a walk in a few sentences,
+and treated the walk's behavior as the game's. In the formalization the
+game and the walk are separate objects, and the step between them is a
+postulate with a name. That is what made it possible to ask whether a
+conclusion of the theory holds of the game, and to find one that does not.
+I think this is the general lesson. Idealizations are where theories make
+their least visible commitments; writing them down as first-class objects,
+rather than as a sentence of motivation, makes them something one can test.
+
+It also says something about the 1988 argument with ACT*. That argument was
+that a theory should not get the power law of practice by building it into a
+mechanism. The graph-dynamic model meets that standard, but the curve it
+yields in its cleanest regime is logarithmic, and the evidence for the power
+law has itself been contested \citep{heathcote2000}. The defensible claim
+now is narrower and, I think, more interesting: that improvement with
+diminishing relative returns, which is what the data most clearly show,
+emerges from search dynamics without any learning curve being assumed, and
+that the same dynamics, with a mediocre decision procedure, make practice
+hurt.
+
+\paragraph{Limitations.} The game results are for three and four bits, and
+for one learning step at a time; the 1988 simulations used five bits and a
+hundred trials of learning. Reproducing Figure~1 of that paper by
+simulation, with the sampler checked against the exact small cases, is the
+next step. The tree idealization is stated, not derived from random-graph
+theory \citep{bollobas1985}, and the exact fan-effect results in the theory
+use settings where the diameter is an integer. Nothing here concerns
+people: the phenomena are properties of the model's behavior, and
+connecting them to human practice data needs the usual assumptions about
+what is measured.
+
+\section{Conclusion}
+
+The 1988 paper argued that learning need not improve performance, and that
+whether it does depends on how decisions are made. Revisiting it with a
+proof assistant confirms that argument and corrects two of its supporting
+claims, and the corrections came from writing the theory down, not from new
+mathematics. That is the point of the title. A model that only runs can
+show that a behavior occurs; a model one can reason about shows what it
+entails, where its approximations hold, and which of its idealizations is
+responsible for a result. Thirty-eight years on, the graph-dynamic model
+has more to say than its authors knew.
+
+\section*{Availability}
+
+All definitions and theorems are in SHH88Revisited \citep{shh88revisited}
+(Lean 4.35.0, Mathlib v4.35.0). Every theorem is fully proved, with no
+\code{sorry}, and depends only on Lean's standard axioms. The Python
+prototypes in \code{tools/} have the same semantics as the Lean
+definitions and generate the exact certificates.
+
+\section*{Acknowledgements}
+
+The original work was done with Tad Hogg and Bernardo Huberman at Xerox
+PARC. Almost all of the Lean programming was accomplished by Claude Code
+with extensive guidance from the author. Papers and presentations were
+initially drafted by LLMs and then substantially rewritten by the author.
+Any remaining errors, including hallucinations, are the author's alone.
+
+\bibliographystyle{unsrtnat}
+\bibliography{refs}
+
+\end{document}
