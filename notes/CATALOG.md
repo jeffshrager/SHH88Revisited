@@ -11,7 +11,7 @@ How to read it:
 
 ## SHH88Revisited
 
-225 theorems: 99 general, 126 instances; 35 headline; 13 about laws; 5 conditional on laws.
+228 theorems: 100 general, 128 instances; 36 headline; 13 about laws; 5 conditional on laws.
 
 **Laws**
 
@@ -47,6 +47,7 @@ How to read it:
 | `SHH.BitGame.r1_moves_closer` | general | — | With a perfect decision procedure and the initial operators, every move is toward the goal: any successor given positive probability at `r = 1` is exactly one bit closer. |
 | `SHH.GD.DOf_pow2` | general | — | The diameters are exact at powers of two: with `n = 2^16`, `D(n, 2^k) = 16/k`. |
 | `SHH.GD.fan_pow2_zero` | instance | — | A fan effect at `r = 0` in the paper's idealized model. With `n = 2^16` nodes and no decision procedure, raising the mean branching from 2 to 4 raises the expected steps from 256 to 9824; from ... |
+| `SHH.GD.no_fan_small` | instance | — | No fan effect in small spaces, in the paper's idealized model. With `n = 8` or `16` nodes, the expected steps fall at every increase of `μ` over the integer-diameter settings, both with no deci... |
 | `SHH.GD.eq5_error_bound` | general | — | The omitted factor is at most `exp(−D/μ)`, from `1 − 1/μ ≤ exp(−1/μ)`. |
 | `SHH.GD.eq5_error_factor` | general | — | The factor Eq. 5 omits: `(μ − 1)^D = μ^D · ((μ − 1)/μ)^D`. |
 | `SHH.GD.curveGD_diminishingRelative` | general | — | Strictly diminishing relative returns: the proportional gain shrinks every trial, the signature that distinguishes a power curve from an exponential one. |
@@ -75,5 +76,5 @@ How to read it:
 
 | Package | Theorems | General | Instances | About laws | Conditional on laws | Headline |
 |---|---|---|---|---|---|---|
-| SHH88Revisited | 225 | 99 | 126 | 13 | 5 | 35 |
-| **All** | 225 | 99 | 126 | 13 | 5 | 35 |
+| SHH88Revisited | 228 | 100 | 128 | 13 | 5 | 36 |
+| **All** | 228 | 100 | 128 | 13 | 5 | 36 |

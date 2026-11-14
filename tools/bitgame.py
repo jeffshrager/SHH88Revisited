@@ -174,7 +174,8 @@ def main():
                 tot += 1
                 if mean_over_games(ops + [new], r, B) > base:
                     worse += 1
-        print(f"  r={r}: {worse} of {tot} single chunks raise the mean expected steps")
+        print(f"  r={r}: {worse} of {tot} start-goal pairs' chunks raise the mean expected steps"
+              f" ({len({tuple(chunk(a, b)) for a in states for b in states if a != b and chunk(a, b) not in ops})} distinct operators)")
 
     # greedy (r = 1) is not always optimal once chunks exist
     print(f"\nB=4: r = 1 with chunks: greedy vs shortest path (search)")

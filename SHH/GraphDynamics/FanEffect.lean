@@ -13,12 +13,17 @@ problem-solving fan effect), with the condition "|ln(1 − r)| ln n > (ln μ)²"
 Here the trade-off is made exact at settings where `D` is an integer, so the walk's closed
 form applies without real exponents: `n = 2^16` nodes and `μ ∈ {2, 4, 16, 256}`, where `D` is
 exactly `16, 8, 4, 2` (`DOf_pow2`). At `r = 0`, going from `μ = 2` to `μ = 4` raises the
-expected steps from 256 to 9824, and only from `μ = 16` on do more edges help
-(`fan_pow2_zero`). So the paper's own idealized model shows a fan effect at `r = 0`, where
+expected steps from 256 to 9824, and by `μ = 16` they have fallen again, to 7744
+(`fan_pow2_zero`; numerically the peak is near `μ = 6`). So the paper's own idealized model shows a fan effect at `r = 0`, where
 the paper says more edges always help; its Eq. 5 reaches that conclusion by replacing
-`(μ − 1)^D` with `μ^D = n` (see `eq5_error_bound`). The paper's simulation at `r = 0`
-(Fig. 1A) does improve with practice, so it is the tree idealization I1 that fails there, not
-the simulation.
+`(μ − 1)^(D−1)` with `μ^(D−1) = n/μ` (see `eq5_error_bound`), an approximation the paper
+states for `μ(1 − r) ≫ 1`, which excludes the small `μ` where the rise occurs.
+
+The effect depends on the size of the space. At `n = 8, 16` the same model shows no fan
+effect at `r = 0` or at `r = 1/2` (`no_fan_small`). The bit game at that size improves on
+average at `r = 0` and worsens at `r = 1/2` (`SHH.BitGame.figure1_pattern_three`), so at the
+game's own size the idealization agrees with the game at `r = 0` and misses its fan effect
+at `r = 1/2`.
 
 OPEN: the same at non-integer `D` (the closed form with a real exponent), and an exact
 condition for the sign of `ds/dμ` in the drift regime to replace the paper's.
@@ -78,5 +83,44 @@ theorem fan_pow2_half :
 
 theorem pOf_half_values : pOf 2 (1/2) = 2/3 ∧ pOf 4 (1/2) = 2/5 ∧ pOf 16 (1/2) = 2/17 := by
   unfold pOf; norm_num
+
+/-- The `r = 1/2` column exactly, including `μ = 256` (`p = 2/257`, `D = 2`):
+`720897/16384 ≈ 44.0`, `16355/64 ≈ 255.5`, `4471/4 = 1117.75`, `257`. So at `r = 1/2` more
+edges still hurt at `μ = 16` and help only by `μ = 256`. -/
+theorem fan_pow2_half_values :
+    Walk.s (2/3) 16 = 720897/16384 ∧ Walk.s (2/5) 8 = 16355/64 ∧ Walk.s (2/17) 4 = 4471/4 ∧
+      Walk.s (2/257) 2 = 257 := by
+  unfold Walk.s; norm_num
+
+/-! ### The fan effect depends on the size of the space
+
+The same idealized model at the size of the games that can be solved exactly: `n = 2^m` for
+`m = 3, 4` (the three- and four-bit games' state counts), at every `μ = 2^k` with `k ∣ m`,
+where the diameter is the integer `m/k` (`DOf_pow2_gen`). Between those settings, and at
+`n = 32`, the prototype (`tools/walk_check.py`, real exponent) also shows no rise; by
+`n = 64` a slight one appears (36 → 39.8 at `μ = 3`, `r = 0`). NOT MODELED: a certificate at
+non-integer `D`. -/
+
+/-- The diameters at powers of two, any size: `D(2^m, 2^k) = m/k`. -/
+theorem DOf_pow2_gen (m k : ℕ) (hk : 0 < k) : DOf ((2 : ℝ)^m) ((2 : ℝ)^k) = m / k := by
+  unfold DOf
+  rw [Real.log_pow, Real.log_pow]
+  have h2 : 0 < Real.log 2 := Real.log_pos (by norm_num)
+  have hk' : (k : ℝ) ≠ 0 := by positivity
+  field_simp
+
+/-- **No fan effect in small spaces, in the paper's idealized model.** With `n = 8` or `16`
+nodes, the expected steps fall at every increase of `μ` over the integer-diameter settings,
+both with no decision procedure (`r = 0`: 9 → 1; 16 → 8 → 1) and with a mediocre one
+(`r = 1/2`: 11/2 → 1; 33/4 → 5 → 1). The fan
+effect of `fan_pow2_zero` and `fan_pow2_half` is a property of large spaces. (Postulates: the
+walk, I1, I2.) -/
+theorem no_fan_small :
+    -- n = 8: μ = 2, 8 (D = 3, 1)
+    (Walk.s (1/2) 3 = 9 ∧ Walk.s (1/8) 1 = 1) ∧ (Walk.s (2/3) 3 = 11/2 ∧ Walk.s (2/9) 1 = 1) ∧
+    -- n = 16: μ = 2, 4, 16 (D = 4, 2, 1)
+    (Walk.s (1/2) 4 = 16 ∧ Walk.s (1/4) 2 = 8 ∧ Walk.s (1/16) 1 = 1) ∧
+    (Walk.s (2/3) 4 = 33/4 ∧ Walk.s (2/5) 2 = 5 ∧ Walk.s (2/17) 1 = 1) := by
+  unfold Walk.s; norm_num
 
 end SHH.GD

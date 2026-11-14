@@ -44,13 +44,16 @@ curves. Most of the 1988 mathematics survives: the expected-steps formula
 is correct exactly as printed, and its drift and diffusion regimes hold,
 one of them in a sharper form. But two of the paper's conclusions do not
 follow from its own theory. With no decision procedure, the idealized
-model shows a fan effect that the paper says is absent; and with a perfect
+model shows a fan effect in large problem spaces that the paper says is
+absent; and with a perfect
 decision procedure the ``power-law decay'' it derives is logarithmic, a
 curve with every qualitative signature of a power law over the range
 plotted, and provably not one over long ranges. In the bit game itself,
-exact results reproduce the 1988 simulations' pattern, which locates the
-first discrepancy precisely: in the idealization that connects the game to
-the theory, not in the game. None of these findings needed new
+exact results reproduce the pattern of the 1988 simulations. But the
+theory's fan effect turns out to depend on the size of the problem space,
+and at the size of the game it predicts none, so the theory does not
+explain the fan effect that the simulations showed. None of these findings
+needed new
 mathematics. They needed the theory written down precisely enough that its
 consequences could be checked.
 \end{abstract}
@@ -100,8 +103,9 @@ establishes it.
 The outcome is a mixed verdict, which is the interesting kind. The
 mathematics of the walk is right. But the two conclusions the paper drew
 from it about practice do not follow: one is contradicted by the paper's
-own idealized model, and the other names the wrong curve. And the place
-where theory and game come apart can be located exactly.
+own idealized model, and the other names the wrong curve. And the theory
+and the game, which the paper treated as showing the same thing, turn out
+to come apart in a place nobody was looking.
 
 \section{The model}
 \label{sec:model}
@@ -200,15 +204,20 @@ decision procedure the paper approximates Eq.~4 by its Eq.~5, $s \approx
 (choices made at random), increasing the number of edges reduces the time
 to solve the problem''. The approximation replaces $(\mu-1)^{D-1}$ by
 $\mu^{D-1} = n/\mu$, dropping a factor $((\mu-1)/\mu)^{D-1}$ that is at most
-$e^{-(D-1)/\mu}$ (\lean{SHH.GD.eq5\_error\_bound}). Where $\mu$ is small,
-which is where learning starts, that factor is far from one. Restoring it
+$e^{-(D-1)/\mu}$ (\lean{SHH.GD.eq5\_error\_bound}). The paper states Eq.~5
+for $\mu(1-r) \gg 1$, and there the factor is harmless. But the conclusion
+about $r = 0$ is stated without that proviso, and where $\mu$ is small,
+which is where learning starts, the factor is far from one. Restoring it
 reverses the conclusion. With $n = 2^{16}$ nodes, where the diameter is an
 integer for $\mu = 2, 4, 16, 256$ (\lean{SHH.GD.DOf\_pow2}), the paper's
 own idealized model gives the expected steps in Table~\ref{tab:fan}: at
 $r = 0$, raising the mean branching from 2 to 4 raises the expected steps
-from 256 to 9{,}824, and only from $\mu = 16$ on do more edges help
-(\lean{SHH.GD.fan\_pow2\_zero}). In the theory, there is a fan effect with
-no decision procedure at all.
+from 256 to 9{,}824, and by $\mu = 16$ they have come back down only to
+7{,}744 (\lean{SHH.GD.fan\_pow2\_zero}; numerically the peak is near
+$\mu = 6$). In the theory, in a space this large, there is a fan effect
+with no decision procedure at all. The same happens at the $n = 10{,}000$
+of the paper's Figure~2, where the prototype has the expected steps rising
+from $\mu = 2$ until about $\mu = 5$.
 
 \begin{table}[H]
 \centering\small
@@ -219,13 +228,13 @@ $\mu$ & $D$ & $r = 0$ & $r = \tfrac12$ & $r = 1$ \\
 2   & 16 & 256     & 44.0    & 16 \\
 4   & 8  & 9{,}824 & 255.5   & 8 \\
 16  & 4  & 7{,}744 & 1{,}117.75 & 4 \\
-256 & 2  & 512     & 257$^\dagger$ & 2 \\
+256 & 2  & 512     & 257 & 2 \\
 \bottomrule
 \end{tabular}
 \caption{Expected steps in the paper's idealized model, $n = 2^{16}$, from
 the proved closed form (\lean{SHH.GD.fan\_pow2\_zero},
-\lean{SHH.GD.fan\_pow2\_half}, \lean{SHH.Walk.s\_one}). $^\dagger$From the
-prototype (\code{tools/walk\_check.py}), not certified.}
+\lean{SHH.GD.fan\_pow2\_half\_values}, \lean{SHH.Walk.s\_one}). The
+$r = \tfrac12$ entries are rounded; the exact values are in the theorem.}
 \label{tab:fan}
 \end{table}
 
@@ -240,11 +249,13 @@ is then $T(t) = \ln n/\ln(\mu_0 + ct)$ (\lean{SHH.GD.curveGD}). It improves
 with every trial (\lean{SHH.GD.curveGD\_improves}), and its proportional
 gains shrink trial by trial (\lean{SHH.GD.curveGD\_diminishingRelative}),
 the signature that distinguishes a power curve from an exponential one
-\citep{heathcote2000}. Over trials 1--100 it lies within about 12\% of a
-power law with exponent $-0.29$ (\code{tools/walk\_check.py}). But it is not
-a power law. Its doubling ratio $T(2t)/T(t)$ tends to 1, so for any
-exponent and tolerance, approximate scale invariance fails beyond some
-trial (\lean{SHH.GD.curveGD\_not\_powerLaw}). The curve is logarithmic. On a
+\citep{heathcote2000}. Over trials 1--100, with $n = 10^4$, $\mu_0 = 2$ and $c = 1$, it lies
+within about 12\% of a power law with exponent $-0.29$
+(\code{tools/walk\_check.py}). But it is not a power law. A power law
+shrinks by a fixed ratio $\rho < 1$ every time the number of trials
+doubles; this curve's doubling ratio $T(2t)/T(t)$ tends to 1, so for any
+such $\rho$, and any tolerance too small to reach 1 from it, approximate
+scale invariance fails beyond some trial (\lean{SHH.GD.curveGD\_not\_powerLaw}). The curve is logarithmic. On a
 log-log plot over the one decade of Figure~1 of the 1988 paper, the
 difference is invisible.
 
@@ -257,8 +268,8 @@ from one over the range anyone plotted.
 \section{The game itself}
 \label{sec:game}
 
-The theory's conclusions are about an idealization. Is the fan effect at
-$r = 0$ a property of search in the bit game, or of the idealization? The
+The theory's conclusions are about an idealization. Does the bit game
+itself behave as the theory says? The
 formalization can answer this exactly for small games, because the expected
 number of steps in the game is the solution of a finite linear system, and
 that solution is unique whenever the goal is reachable
@@ -268,15 +279,39 @@ of values checked to satisfy the system is the expected number of steps.
 On the three-bit game, adding one learned operator lowers the mean expected
 steps over all 56 games at $r = 0$ and at $r = 1$, and raises it at
 $r = \tfrac12$ (Table~\ref{tab:game}; \lean{SHH.BitGame.figure1\_pattern\_three}).
-The prototype finds the same for every one of the 32 operators that could
-be learned. This is the pattern of the 1988 simulations: improvement with
-no decision procedure and with a perfect one, degradation with a mediocre
-one. So the bit game does not show the fan effect at $r = 0$ that its
-idealization does. The discrepancy is in the idealization: a hypercube is
-full of short cycles, and the tree that the theory substitutes for it has
-none. (Individual games can still slow down at $r = 0$: \code{000}
+The prototype finds the same for every one of the 20 new operators that
+could be learned. This is the pattern of the 1988 simulations: improvement
+with no decision procedure and with a perfect one, degradation with a
+mediocre one. (Individual games can still slow down at $r = 0$: \code{000}
 $\to$ \code{001} goes from 7 to $133/15$ expected steps,
 \lean{SHH.BitGame.chunk\_slows\_game}. It is the average that improves.)
+
+So the game shows no fan effect at $r = 0$, and the theory, in
+Table~\ref{tab:fan}, shows one. My first thought was that this was the
+tree's fault: a hypercube is full of short cycles, and the tree the theory
+substitutes for it has none. That is not what the theorems say. The
+theory's fan effect depends on the size of the space. Table~\ref{tab:fan}
+has $2^{16}$ nodes; the three-bit game has 8. At 8 and at 16 nodes the
+idealized model has no fan effect, at $r = 0$ or at $r = \tfrac12$:
+over the settings where the diameter is an integer, every increase in
+$\mu$ lowers the expected steps (\lean{SHH.GD.no\_fan\_small}; with 16 nodes
+and $r = \tfrac12$, for instance, $\mu = 2, 4, 16$ give $8.25$, $5$ and
+$1$). The prototype, which can use any $\mu$, says the same in between and
+at the 32 nodes of the 1988 simulations; the first slight rise appears at
+about 64 nodes.
+
+So at the size of the game, theory and game agree at $r = 0$, where
+neither has a fan effect, and disagree at $r = \tfrac12$, where the game
+has one and the theory does not. This is the reverse of what the 1988
+paper took the theory to show. Its Figure~2 plotted Eq.~2 for 10{,}000
+nodes and found the simulations' pattern in it; at the 32 nodes of the
+simulations themselves, the same equation predicts steady improvement in
+every regime. The fan effect in the bit game is real, but the walk is not
+what explains it. I do not yet know what does. The comparison is rough,
+since a tree with a diameter of two or three is a poor picture of
+anything, and one learned operator is not a uniform increase in branching;
+but that is a reason to doubt that the theory applies at this size, not a
+reason to think it explains what happens there.
 
 \begin{table}[H]
 \centering\small
@@ -315,10 +350,10 @@ Eq.~2, the expected steps & proved, exactly as printed (\lean{SHH.Walk.eq2\_prin
 $s = D^2$ when $p_+ = p_-$ & proved; fixes reflection at $D$ (\lean{SHH.Walk.s\_half}) \\
 Eq.~3, drift & proved as a two-sided bound (\lean{SHH.Walk.drift\_bounds}) \\
 Eq.~4, diffusion & proved as Eq.~2's exponential term (\lean{SHH.Walk.eq4\_remainder}) \\
-Eq.~5 and ``at $r = 0$ more edges reduce the time'' & refuted in the paper's own idealized model (\lean{SHH.GD.fan\_pow2\_zero}) \\
-Fan effect at intermediate $r$ & proved, theory (\lean{SHH.GD.fan\_pow2\_half}) and game (\lean{SHH.BitGame.figure1\_pattern\_three}) \\
+Eq.~5 and ``at $r = 0$ more edges reduce the time'' & refuted in the paper's own idealized model for large spaces (\lean{SHH.GD.fan\_pow2\_zero}); holds in the smallest ones (\lean{SHH.GD.no\_fan\_small}) \\
+Fan effect at intermediate $r$ & proved in the theory for large spaces (\lean{SHH.GD.fan\_pow2\_half}) and in the three-bit game (\lean{SHH.BitGame.figure1\_pattern\_three}) \\
 Eq.~6 and ``a power-law decay'' & reinterpreted: logarithmic, not a power law (\lean{SHH.GD.curveGD\_not\_powerLaw}) \\
-Eq.~2 ``produces the range of behaviors observed'' & fails at $r = 0$ because of the tree idealization (\lean{SHH.BitGame.figure1\_pattern\_three}) \\
+Eq.~2 ``produces the range of behaviors observed'' & not at the size of the game: there the theory has no fan effect at $r = \tfrac12$, and the game does (\lean{SHH.GD.no\_fan\_small}, \lean{SHH.BitGame.figure1\_pattern\_three}) \\
 $r = 1$ approximates optimal search & proved optimal on the initial operators (\lean{SHH.BitGame.r1\_moves\_closer}); not optimal with learned ones (\lean{SHH.BitGame.greedy\_not\_optimal}) \\
 \bottomrule
 \end{tabularx}
@@ -342,7 +377,9 @@ from the bit game to a random graph to a tree to a walk in a few sentences,
 and treated the walk's behavior as the game's. In the formalization the
 game and the walk are separate objects, and the step between them is a
 postulate with a name. That is what made it possible to ask whether a
-conclusion of the theory holds of the game, and to find one that does not.
+conclusion of the theory holds of the game, and to find that the theory's
+fan effect and the game's are not the same effect: one needs a large space
+and the other was observed in a space of 32 states.
 I think this is the general lesson. Idealizations are where theories make
 their least visible commitments; writing them down as first-class objects,
 rather than as a sentence of motivation, makes them something one can test.
@@ -360,7 +397,9 @@ mechanism. The graph-dynamic model meets that standard, but the curve it
 yields in its cleanest regime is logarithmic, and the evidence for the power
 law has itself been contested \citep{heathcote2000}. The defensible claim
 now is narrower and, I think, more interesting: that improvement with
-diminishing relative returns, which is what the data most clearly show,
+diminishing relative returns, the shape that separates a power law from
+an exponential and the very thing Heathcote and colleagues dispute in the
+data of individual learners,
 emerges from search dynamics without any learning curve being assumed, and
 that the same dynamics, with a mediocre decision procedure, make practice
 hurt.
@@ -369,9 +408,11 @@ hurt.
 for one learning step at a time; the 1988 simulations used five bits and a
 hundred trials of learning. Reproducing Figure~1 of that paper by
 simulation, with the sampler checked against the exact small cases, is the
-next step. The tree idealization is stated, not derived from random-graph
-theory \citep{bollobas1985}, and the exact fan-effect results in the theory
-use settings where the diameter is an integer. Nothing here concerns
+next step, and it will show whether the game's fan effect at five bits
+behaves as it does at three. The tree idealization is stated, not derived
+from random-graph theory \citep{bollobas1985}, and the exact results in the
+theory, in large spaces and small, use settings where the diameter is an
+integer; between those settings I have only the prototype's numbers. Nothing here concerns
 people: the phenomena are properties of the model's behavior, and
 connecting them to human practice data needs the usual assumptions about
 what is measured.
@@ -380,9 +421,10 @@ what is measured.
 
 The 1988 paper argued that learning need not improve performance, and that
 whether it does depends on how decisions are made. Revisiting it with a
-proof assistant confirms that argument and corrects two of its supporting
-claims, and the corrections came from writing the theory down, not from new
-mathematics. A model that only runs can
+proof assistant confirms that argument, corrects two of its supporting
+claims, and reopens a question the paper thought it had closed: why the
+bit game shows a fan effect at all. All of this came from writing the
+theory down, not from new mathematics. A model that only runs can
 show that a behavior occurs; a model one can reason about shows what it
 entails, where its approximations hold, and which of its idealizations is
 responsible for a result. Thirty-eight years on, the graph-dynamic model

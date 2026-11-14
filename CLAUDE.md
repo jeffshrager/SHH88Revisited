@@ -8,7 +8,7 @@ CogLean lab repository; `SHH/Phenomena/LearningCurve.lean` is copied from it wit
 
 - Lean 4.35.0 via elan (`export PATH=$HOME/.elan/bin:$PATH`); Mathlib v4.35.0 (`lake exe cache
   get` once, then `lake build`). One package, one library `SHH`; layering by imports:
-  `Phenomena` ← `Walk` ← `GraphDynamics` (later `BitGame`, `Sims`).
+  `Phenomena` ← `Walk` ← `GraphDynamics`; `Markov` ← `BitGame` (later `Sims`).
 - `Walk/` is over exact `ℚ` with `D : ℕ`; `GraphDynamics/` over `ℝ` (logs, real exponents).
 - Every theorem fully proved: no `sorry`; `#print axioms` shows only `propext`, `Quot.sound`,
   `Classical.choice`.

@@ -14,7 +14,7 @@ This is the pattern of the paper's Figure 1 (improvement at `r = 0` and `r = 1`,
 degradation at `r = 1/2`), exact, in the bit game itself. It is also what the paper's tree
 idealization gets wrong at `r = 0`, where the idealized walk shows a fan effect
 (`SHH.GD.fan_pow2_zero`) and the real game does not. (`tools/bitgame.py`: the same holds for
-every one of the 32 single chunks.)
+every one of the 20 new single chunks (32 start-goal pairs).)
 -/
 
 namespace SHH.BitGame

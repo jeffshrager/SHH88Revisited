@@ -112,6 +112,22 @@ def main():
             extra = f"   paper's Eq. 5 approx 2n/mu = {2e4/mu:8.1f}" if r == 0 else ""
             print(f"    mu={mu:4d}  s={s_gd(1e4, mu, r):10.3f}{extra}")
 
+    print("\nThe fan effect depends on n: s(mu; n, r), continuous D (peak marked *):")
+    for n in [8, 16, 32, 64, 1024, 10 ** 4, 2 ** 16]:
+        for r in [0, 0.5]:
+            mus = [2, 3, 4, 5, 6, 8, 10, 16]
+            vals = [s_gd(n, mu, r) for mu in mus]
+            pk = max(range(len(vals)), key=lambda i: vals[i])
+            row = "  ".join(f"{v:.2f}{'*' if i == pk and i > 0 else ''}" for i, v in enumerate(vals))
+            print(f"    n={n:6d} r={r}: mu=2,3,4,5,6,8,10,16: {row}")
+
+    print("\nSmall spaces, D exact (SHH.GD.no_fan_small), and the r = 1/2 column at n = 2^16:")
+    for m in [3, 4, 6, 16]:
+        for r in [F(0), F(1, 2)]:
+            row = [f"mu={2**k} D={m//k}: {closed(p_of(F(2**k), r), m // k)}"
+                   for k in range(1, m + 1) if m % k == 0]
+            print(f"    n=2^{m} r={r}: " + "; ".join(row))
+
     print("\nPower-of-two family (D exact): n = 2^16, r = 0:")
     for mu in [2, 4, 16, 256]:
         D = int(round(D_of(2 ** 16, mu)))
