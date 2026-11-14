@@ -10,7 +10,7 @@ refuted or reinterpreted (`notes/CLAIMS.md`). It depends on nothing from the
 learning-curve predicates are copied from it with provenance.
 
 Work in progress. Milestone 1 (theory tier, built): the theory tier, the one-dimensional walk of p. 416
-and its regimes, over exact rationals and the reals. Milestone 2: the bit game as an executable
+and its regimes, over exact rationals and the reals. Milestone 2 (done): the bit game as an executable
 model. Milestone 3: Figure 1 by simulation. Milestone 4: the paper.
 
 ## Layout

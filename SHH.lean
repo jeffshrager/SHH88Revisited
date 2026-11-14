@@ -13,5 +13,6 @@ import SHH.BitGame.Optimal
 import SHH.Markov.Hitting
 import SHH.BitGame.Exact
 import SHH.BitGame.ExactMean
+import SHH.BitGame.Greedy
 
 /-! SHH88Revisited: Shrager, Hogg & Huberman (1988) in Lean. -/

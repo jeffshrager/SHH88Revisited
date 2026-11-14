@@ -11,7 +11,7 @@ How to read it:
 
 ## SHH88Revisited
 
-222 theorems: 98 general, 124 instances; 33 headline; 13 about laws; 5 conditional on laws.
+225 theorems: 99 general, 126 instances; 35 headline; 13 about laws; 5 conditional on laws.
 
 **Laws**
 
@@ -39,6 +39,8 @@ How to read it:
 | `SHH.BitGame.chunk_paper_applies` | instance | — | It connects two pairs of states: of the 32 five-bit states it applies to exactly `01010` and `01110`. |
 | `SHH.BitGame.chunk_slows_game` | instance | — | One chunk can slow a game down (the fan effect, for a single game). |
 | `SHH.BitGame.figure1_pattern_three` | general | — | Figure 1's pattern, exact, in the three-bit game. One chunk lowers the mean expected steps over all games at `r = 0` (8.2857 → 8.2635) and at `r = 1` (1.7143 → 1.6429), and raises it at `r = 1/... |
+| `SHH.BitGame.greedy_not_optimal` | general | — | The `r = 1` procedure expects 15/4 moves on `0001 → 1110` with the chunk `0000 → 1111`. |
+| `SHH.BitGame.three_step_path` | instance | — | A three-move path exists: `0001 → 0000 → 1111 → 1110`. |
 | `SHH.BitGame.apply_flip` | general | — | A one-bit operator flips its bit, if the bit matches. |
 | `SHH.BitGame.ham_flip` | general | — | Flipping one bit changes the distance by one: up if the bit already agreed with the goal, down if it did not. |
 | `SHH.BitGame.mem_succs` | general | — | The successors under the initial operators are the one-bit flips. |
@@ -73,5 +75,5 @@ How to read it:
 
 | Package | Theorems | General | Instances | About laws | Conditional on laws | Headline |
 |---|---|---|---|---|---|---|
-| SHH88Revisited | 222 | 98 | 124 | 13 | 5 | 33 |
-| **All** | 222 | 98 | 124 | 13 | 5 | 33 |
+| SHH88Revisited | 225 | 99 | 126 | 13 | 5 | 35 |
+| **All** | 225 | 99 | 126 | 13 | 5 | 35 |
