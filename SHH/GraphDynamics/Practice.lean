@@ -71,8 +71,9 @@ theorem curveGD_diminishingRelative (lo hi : ℕ) :
   have hmid : (μ₀ + c * ((t + 1 : ℕ) : ℝ)) = (1/2 : ℝ) * x₀ + (1/2 : ℝ) * (μ₀ + c * ((t + 2 : ℕ) : ℝ)) := by
     push_cast; ring
   set x₂ : ℝ := μ₀ + c * ((t + 2 : ℕ) : ℝ) with hx₂
-  have hx₂1 : 1 < x₂ := by push_cast; linarith
-  have hne : x₀ ≠ x₂ := by push_cast; intro h; linarith
+  have hc2 : c * ((t + 2 : ℕ) : ℝ) = c * t + 2 * c := by push_cast; ring
+  have hx₂1 : 1 < x₂ := by rw [hx₂, hc2]; linarith
+  have hne : x₀ ≠ x₂ := by rw [hx₀, hx₂, hc2]; intro h; linarith
   have L0 : 0 < Real.log x₀ := Real.log_pos hx₀1
   have L2 : 0 < Real.log x₂ := Real.log_pos hx₂1
   have hconc := (strictConcaveOn_log_Ioi).2 (Set.mem_Ioi.mpr (by linarith : (0:ℝ) < x₀))
@@ -83,10 +84,9 @@ theorem curveGD_diminishingRelative (lo hi : ℕ) :
   set L1 := Real.log ((1/2 : ℝ) * x₀ + (1/2 : ℝ) * x₂) with hL1
   have hL1pos : 0 < L1 := by linarith
   -- goal: (A/L1)² < (A/log x₀)(A/log x₂), i.e. log x₀ · log x₂ < L1², from L1 > (log x₀ + log x₂)/2
-  rw [div_mul_div_comm, div_mul_div_comm, div_lt_div_iff_of_pos (by positivity) (by positivity)]
-  have hsq : Real.log x₀ * Real.log x₂ < L1 * L1 := by
-    nlinarith [sq_nonneg (Real.log x₀ - Real.log x₂)]
-  nlinarith [hsq, hA0]
+  rw [div_mul_div_comm, div_mul_div_comm]
+  apply div_lt_div_of_pos_left (by positivity) (by positivity)
+  nlinarith [sq_nonneg (Real.log x₀ - Real.log x₂)]
 
 end
 
@@ -137,14 +137,22 @@ theorem curveGD_not_powerLaw {n μ₀ c : ℝ} (hn : 1 < n) (hμ : 1 < μ₀) (h
   · push_neg at hρpos
     have h1ρ : 0 < 1 - ρ := by linarith
     have hKval : ρ * Real.log 2 / (1 - ρ) + 1 ≤ K := by
-      rw [hK]; exact add_le_add_right (le_max_right _ _) 1
+      rw [hK]; linarith [le_max_right (0:ℝ) (ρ * Real.log 2 / (1 - ρ))]
     -- from hupper: L ≤ ρ (log 2 + L) after clearing, contradiction with L > ρ log 2/(1−ρ)
     have hA : Real.log n / (Real.log 2 + L) ≤ Real.log n / Real.log (μ₀ + c * ((2 * t : ℕ) : ℝ)) :=
       div_le_div_of_nonneg_left hA0.le hL2pos hL2
-    have hcomb : Real.log n / (Real.log 2 + L) ≤ ρ * (Real.log n / L) := le_trans hA hupper
-    rw [mul_div_assoc', div_le_div_iff_of_pos (by linarith) hLpos] at hcomb
-    -- log n · L ≤ ρ log n (log 2 + L)
-    have : L ≤ ρ * (Real.log 2 + L) := by nlinarith
+    have hupper' : Real.log n / Real.log (μ₀ + c * ((2 * t : ℕ) : ℝ)) ≤ ρ * (Real.log n / L) := by
+      calc _ ≤ (1 + ε) * (r * (Real.log n / L)) := hupper
+        _ = ρ * (Real.log n / L) := by rw [hρ]; ring
+    have hcomb : Real.log n / (Real.log 2 + L) ≤ ρ * (Real.log n / L) := le_trans hA hupper'
+    rw [mul_div_assoc', div_le_iff₀ (by linarith : (0:ℝ) < Real.log 2 + L)] at hcomb
+    rw [div_mul_eq_mul_div, le_div_iff₀ hLpos] at hcomb
+    -- hcomb : log n · L ≤ ρ · log n · (log 2 + L)
+    have : L ≤ ρ * (Real.log 2 + L) := by
+      by_contra hcon
+      push_neg at hcon
+      have := mul_lt_mul_of_pos_left hcon hA0
+      nlinarith
     have : L * (1 - ρ) ≤ ρ * Real.log 2 := by linarith
     have : L ≤ ρ * Real.log 2 / (1 - ρ) := by rw [le_div_iff₀ h1ρ]; linarith
     linarith

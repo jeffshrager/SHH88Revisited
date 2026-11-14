@@ -9,7 +9,7 @@ refuted or reinterpreted (`notes/CLAIMS.md`). It depends on nothing from the
 [CogLean lab repository](https://github.com/jeffshrager/CogLean); the theory-neutral
 learning-curve predicates are copied from it with provenance.
 
-Work in progress. Milestone 1 (in progress): the theory tier, the one-dimensional walk of p. 416
+Work in progress. Milestone 1 (theory tier, built): the theory tier, the one-dimensional walk of p. 416
 and its regimes, over exact rationals and the reals. Milestone 2: the bit game as an executable
 model. Milestone 3: Figure 1 by simulation. Milestone 4: the paper.
 

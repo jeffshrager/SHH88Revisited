@@ -1,4 +1,5 @@
 import SHH.GraphDynamics.Params
+import SHH.Phenomena.LearningCurve
 
 /-!
 # The fan effect in the idealized model
@@ -34,6 +35,7 @@ theorem DOf_pow2 (k : ℕ) (hk : 0 < k) : DOf ((2 : ℝ)^16) ((2 : ℝ)^k) = 16 
   have h2 : 0 < Real.log 2 := Real.log_pos (by norm_num)
   have hk' : (k : ℝ) ≠ 0 := by positivity
   field_simp
+  norm_num
 
 theorem DOf_2_2 : DOf ((2 : ℝ)^16) 2 = 16 := by
   have := DOf_pow2 1 one_pos; simpa using this
@@ -64,11 +66,11 @@ theorem fan_pow2_worsens :
     Phenomena.Worsens (fun i => [Walk.s (1/2) 16, Walk.s (1/4) 8, Walk.s (1/16) 4,
       Walk.s (1/256) 2].getD i 0) 0 3 := by
   refine ⟨0, le_rfl, by norm_num, ?_⟩
-  simp only [List.getD_cons_zero, List.getD_cons_succ]
+  show Walk.s (1/2) 16 < Walk.s (1/4) 8
   unfold Walk.s; norm_num
 
 /-- At `r = 1/2` and the same `n`: `p = 1/(1 + (μ − 1)/2)`; `μ = 2 → p = 2/3, D = 16`;
-`μ = 4 → p = 2/5, D = 8`; `μ = 16 → p = 2/17, D = 4`. Steps 42.1 → 115.5 → 213.8:
+`μ = 4 → p = 2/5, D = 8`; `μ = 16 → p = 2/17, D = 4`. Steps 44.0 → 255.5 → 1117.75:
 the fan effect at the paper's "mediocre" setting, exactly. -/
 theorem fan_pow2_half :
     Walk.s (2/3) 16 < Walk.s (2/5) 8 ∧ Walk.s (2/5) 8 < Walk.s (2/17) 4 := by
