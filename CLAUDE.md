@@ -1,7 +1,7 @@
 # Working on SHH88Revisited
 
 A self-contained CogLean-style formalization of Shrager, Hogg & Huberman (1988), aiming at a
-paper, "SHH Revisited: Don't Just Run Models, Reason About Them". It depends on nothing from the
+paper, "The Power Law and Fan Effect Revisited". It depends on nothing from the
 CogLean lab repository; `SHH/Phenomena/LearningCurve.lean` is copied from it with provenance.
 
 ## Build

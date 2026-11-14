@@ -1,6 +1,6 @@
 # SHH88Revisited
 
-*SHH Revisited: Don't Just Run Models, Reason About Them.* A self-contained Lean 4 + Mathlib
+*The Power Law and Fan Effect Revisited.* A self-contained Lean 4 + Mathlib
 formalization of Shrager, Hogg & Huberman (1988), "A graph-dynamic model of the power law of
 practice and the problem-solving fan-effect" (*Science* 242, 414–416), in the CogLean style:
 the paper's mechanisms, conditions and idealizations stated as postulates with page references

@@ -15,7 +15,7 @@
 \newcommand{\lean}[1]{\texttt{#1}}
 \newcommand{\code}[1]{\texttt{#1}}
 
-\title{SHH Revisited: Don't Just Run Models, Reason About Them}
+\title{The Power Law and Fan Effect Revisited}
 \author{Jeff Shrager}
 \date{Draft, November 2026}
 
@@ -82,7 +82,7 @@ good the decision procedure is. Each regime of the walk was connected to a
 phenomenon: drift toward the goal to improvement with practice, a balance
 of branching against the shortening of paths to the fan effect. In this
 sense the 1988 paper already had the explanatory shape I have since been
-arguing for in CogLean \citep{coglean,cogleanintro}: mechanisms, together
+arguing for in CogLean\footnote{CogLean is a library of cognitive theory in the Lean proof assistant, in which mechanisms, phenomena and laws are stated once and theorems relating them are machine-checked: \url{https://coglean.org}. This paper is a self-contained application of its approach to one theory.} \citep{coglean,cogleanintro}: mechanisms, together
 with stated conditions, entail phenomena, including conditions under which
 a phenomenon fails or reverses.
 
@@ -347,6 +347,13 @@ I think this is the general lesson. Idealizations are where theories make
 their least visible commitments; writing them down as first-class objects,
 rather than as a sentence of motivation, makes them something one can test.
 
+This is also why the work belongs in a shared library rather than a single paper. The
+phenomena it uses, a curve that improves with diminishing relative returns and a curve
+that worsens, are stated without reference to the graph-dynamic model, so the same
+predicates can be put to ACT-R's base-level learning or to chunking accounts and the
+answers compared, as the CogLean project (\url{https://coglean.org}) does for theories
+of memory \citep{cogleanintro}.
+
 It also says something about the 1988 argument with ACT*. That argument was
 that a theory should not get the power law of practice by building it into a
 mechanism. The graph-dynamic model meets that standard, but the curve it
@@ -375,7 +382,7 @@ The 1988 paper argued that learning need not improve performance, and that
 whether it does depends on how decisions are made. Revisiting it with a
 proof assistant confirms that argument and corrects two of its supporting
 claims, and the corrections came from writing the theory down, not from new
-mathematics. That is the point of the title. A model that only runs can
+mathematics. A model that only runs can
 show that a behavior occurs; a model one can reason about shows what it
 entails, where its approximations hold, and which of its idealizations is
 responsible for a result. Thirty-eight years on, the graph-dynamic model
